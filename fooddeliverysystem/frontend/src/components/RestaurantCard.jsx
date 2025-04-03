@@ -1,20 +1,19 @@
 import React from 'react';
-import { Card, CardContent, CardMedia, Typography, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Card, CardMedia, CardContent, Typography, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const RestaurantCard = ({ restaurant }) => {
+const RestaurantCard = ({ id, name, cuisine, rating, deliveryTime, image }) => {
+  const navigate = useNavigate();
+
   return (
     <Card>
-      <CardMedia
-        component="img"
-        height="140"
-        image="https://via.placeholder.com/300x140.png?text=Restaurant"
-        alt={restaurant.name}
-      />
+      <CardMedia component="img" height="140" image={image} alt={name} />
       <CardContent>
-        <Typography variant="h6">{restaurant.name}</Typography>
-        <Typography variant="body2" color="text.secondary">{restaurant.cuisine}</Typography>
-        <Button component={Link} to={`/menu/${restaurant.id}`} variant="outlined" sx={{ mt: 1 }}>
+        <Typography variant="h6">{name}</Typography>
+        <Typography>{cuisine}</Typography>
+        <Typography>Rating: ⭐ {rating}</Typography>
+        <Typography>Delivery: ⏰ {deliveryTime}</Typography>
+        <Button onClick={() => navigate(`/restaurant/${id}`)} variant="contained" fullWidth>
           View Menu
         </Button>
       </CardContent>
@@ -23,4 +22,3 @@ const RestaurantCard = ({ restaurant }) => {
 };
 
 export default RestaurantCard;
-

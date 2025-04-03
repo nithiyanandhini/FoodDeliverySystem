@@ -1,31 +1,35 @@
-import React, { createContext, useState } from 'react';
+// src/context/CartContext.js
+import { createContext, useContext, useState } from 'react';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState([]);
 
   const addToCart = (item) => {
-    setCartItems((prev) => {
-      const exists = prev.find((i) => i.id === item.id);
-      if (exists) {
-        return prev.map((i) => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
-      } else {
-        return [...prev, { ...item, quantity: 1 }];
+    // Check if item already exists to update quantity
+    setCart((prevCart) => {
+      const existing = prevCart.find((i) => i.id === item.id);
+      if (existing) {
+        return prevCart.map((i) =>
+          i.id === item.id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
+        );
       }
+      return [...prevCart, { ...item, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  const removeFromCart = (itemId) =>
+    setCart((prev) => prev.filter((item) => item.id !== itemId));
 
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => setCart([]); // ✅ Moved here, so it has access to setCart
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );
 };
 
+// ✅ Optional custom hook
+export const useCart = () => useContext(CartContext);

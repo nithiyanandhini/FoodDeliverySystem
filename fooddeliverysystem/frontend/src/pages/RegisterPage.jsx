@@ -1,12 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
-import api from '../AxiosConfig'; 
-import { AuthContext } from '../context/AuthContext';
+import api from '../AxiosConfig';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
-  const { login } = useContext(AuthContext);
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -14,11 +12,12 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/auth/register', { name, email, password }); 
-      login(res.data);
-      navigate('/');
+      await api.post('/auth/register', { username, email, password, role: 'CUSTOMER' });
+      alert('Registration successful');
+      navigate('/login');
     } catch (err) {
-      alert('Registration failed');
+      alert('Registration failed: ' + err.response?.data?.message || err.message);
+      console.error(err);
     }
   };
 
@@ -26,9 +25,25 @@ const RegisterPage = () => {
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>Register</Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-        <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <TextField 
+          label="Username" 
+          value={username} 
+          onChange={(e) => setUsername(e.target.value)} 
+          required 
+        />
+        <TextField 
+          label="Email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          required 
+        />
+        <TextField 
+          label="Password" 
+          type="password" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+          required 
+        />
         <Button type="submit" variant="contained" color="primary">Register</Button>
       </Box>
     </Container>

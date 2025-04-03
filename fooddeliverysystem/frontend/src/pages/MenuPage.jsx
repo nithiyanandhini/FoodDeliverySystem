@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Container, Typography, Card, CardContent, Button, Grid } from '@mui/material';
 import api from '../AxiosConfig';
-
-import { Container, Typography, Grid } from '@mui/material';
-import MenuItemCard from '../components/MenuItemCard';
 
 const MenuPage = () => {
   const { id } = useParams();
-  const [menuItems, setMenuItems] = useState([]);
+  const [menu, setMenu] = useState([]);
 
   useEffect(() => {
-    api.get(`/restaurants/${id}/menu`)
-      .then(res => setMenuItems(res.data))
-      .catch(err => console.error(err));
+    api.get(`/restaurants/${id}/menu`).then(res => setMenu(res.data));
   }, [id]);
 
   return (
-    <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>Menu</Typography>
-      <Grid container spacing={3}>
-        {menuItems.map(item => (
+    <Container sx={{ my: 4 }}>
+      <Typography variant="h4">Menu</Typography>
+      <Grid container spacing={2}>
+        {menu.map(item => (
           <Grid item xs={12} sm={6} md={4} key={item.id}>
-            <MenuItemCard item={item} />
+            <Card>
+              <CardContent>
+                <Typography variant="h6">{item.name}</Typography>
+                <Typography>{item.description}</Typography>
+                <Typography>${item.price}</Typography>
+                <Button variant="contained" fullWidth>Add to Cart</Button>
+              </CardContent>
+            </Card>
           </Grid>
         ))}
       </Grid>

@@ -1,30 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import api from '../AxiosConfig'; 
-import { Grid, Container, Typography } from '@mui/material';
-import RestaurantCard from '../components/RestaurantCard';
+import React from 'react';
+import { Card, CardContent, Typography } from '@mui/material';
 
-const RestaurantsPage = () => {
-  const [restaurants, setRestaurants] = useState([]);
-
+const RestaurantCard = ({ restaurant }) => {
+  useEffect(() => {
+    api.get('/restaurants')  
+      .then(res => {
+        console.log("API Response:", res.data); // check if it's array of objects
+        setRestaurants(res.data);
+      })
+      .catch(err => console.error(err));
+  }, []);
   
-useEffect(() => {
-  api.get('/restaurants')  
-      .then(res => setRestaurants(res.data))
-    .catch(err => console.error(err));
-}, []);
-
   return (
-    <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>Restaurants</Typography>
-      <Grid container spacing={3}>
-        {restaurants.map(restaurant => (
-          <Grid item xs={12} sm={6} md={4} key={restaurant.id}>
-            <RestaurantCard restaurant={restaurant} />
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+    <Card>
+      <CardContent>
+        <Typography variant="h6">{restaurant.name}</Typography>
+        <Typography variant="body2">{restaurant.cuisine}</Typography>
+        {/* Example: only show strings, not full objects */}
+      </CardContent>
+    </Card>
   );
 };
 
-export default RestaurantsPage;
+export default RestaurantCard;
