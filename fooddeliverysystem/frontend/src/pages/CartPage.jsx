@@ -1,4 +1,3 @@
-// src/pages/CartPage.jsx
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
@@ -11,10 +10,14 @@ const CartPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const navigate = useNavigate();
 
-  const total = cartItems.reduce(
+  // Safe reduce even if cartItems is undefined
+  const total = (cartItems ?? []).reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
+
+  // Show message if cart is empty
+  if (!cartItems || cartItems.length === 0) return <p>Your cart is empty.</p>;
 
   const handlePlaceOrder = async () => {
     setLoading(true);
@@ -26,8 +29,8 @@ const CartPage = () => {
           menuItemId: item.id,
           quantity: item.quantity
         })),
-        address: address,
-        paymentMethod: paymentMethod,
+        address,
+        paymentMethod,
         totalAmount: total
       };
 
@@ -45,15 +48,6 @@ const CartPage = () => {
       setLoading(false);
     }
   };
-<button
-  onClick={handlePlaceOrder}
-  disabled={cartItems.length === 0 || loading}
-  className="place-order-btn"
->
-  {loading ? 'Placing Order...' : 'Place Order'}
-</button>
-
-  if (cartItems.length === 0) return <p>Your cart is empty.</p>;
 
   return (
     <div className="cart-page">
