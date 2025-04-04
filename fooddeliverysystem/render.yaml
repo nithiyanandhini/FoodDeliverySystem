@@ -1,9 +1,1 @@
-# render.yaml
-services:
-  - type: web
-    name: fooddelivery-backend
-    env: java
-    plan: free
-    buildCommand: "./mvnw clean package"
-    startCommand: "java -jar target/*.jar"
-    rootDir: fooddeliverysystem/backend
+
