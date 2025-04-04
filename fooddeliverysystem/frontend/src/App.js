@@ -7,6 +7,8 @@ import RestaurantSelection from './pages/RestaurantSelection';
 import CartPage from './pages/CartPage';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import OrderConfirmation from './pages/OrderConfirmation';
+
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/restaurants" element={<RestaurantSelection />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

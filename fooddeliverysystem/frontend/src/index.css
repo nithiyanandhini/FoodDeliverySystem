@@ -11,3 +11,33 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.cart-page, .order-confirmation {
+  max-width: 600px;
+  margin: auto;
+  padding: 2rem;
+}
+
+textarea, select {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+.place-order-btn {
+  background-color: tomato;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s;
+}
+
+.place-order-btn:hover {
+  background-color: #c0392b;
+}
+
+.place-order-btn:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}

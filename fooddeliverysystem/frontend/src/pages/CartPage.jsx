@@ -1,55 +1,99 @@
-import React from 'react';
-import { useCart } from '../context/CartContext';
-import {
-  Container,
-  Typography,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Button
-} from '@mui/material';
+// src/pages/CartPage.jsx
+import React, { useContext, useState } from 'react';
+import axios from 'axios';
+import { CartContext } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
-  const { cart, clearCart } = useCart(); // ✅ Called inside component
+  const { cartItems, clearCart } = useContext(CartContext);
+  const [loading, setLoading] = useState(false);
+  const [address, setAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('COD');
+  const navigate = useNavigate();
 
-  const subtotal = cart.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
-  const gst = +(subtotal * 0.05).toFixed(2); // 5% GST
-  const tax = +(subtotal * 0.1).toFixed(2);  // 10% service tax
-  const total = +(subtotal + gst + tax).toFixed(2);
+  const total = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+
+  const handlePlaceOrder = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+
+      const orderPayload = {
+        items: cartItems.map(item => ({
+          menuItemId: item.id,
+          quantity: item.quantity
+        })),
+        address: address,
+        paymentMethod: paymentMethod,
+        totalAmount: total
+      };
+
+      await axios.post('http://localhost:8082/api/orders', orderPayload, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      clearCart();
+      navigate('/order-confirmation'); // redirect to confirmation screen
+    } catch (error) {
+      alert('Failed to place order. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+<button
+  onClick={handlePlaceOrder}
+  disabled={cartItems.length === 0 || loading}
+  className="place-order-btn"
+>
+  {loading ? 'Placing Order...' : 'Place Order'}
+</button>
+
+  if (cartItems.length === 0) return <p>Your cart is empty.</p>;
 
   return (
-    <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>🛒 Your Cart</Typography>
+    <div className="cart-page">
+      <h2>🛒 Your Cart</h2>
+      <ul>
+        {cartItems.map(item => (
+          <li key={item.id}>
+            {item.name} - {item.quantity} x ₹{item.price}
+          </li>
+        ))}
+      </ul>
 
-      {cart.length === 0 ? (
-        <Typography>Your cart is empty.</Typography>
-      ) : (
-        <>
-          <List>
-            {cart.map(item => (
-              <ListItem key={item.id}>
-                <ListItemText
-                  primary={`${item.name} x${item.quantity || 1}`}
-                  secondary={`₹${item.price} x ${item.quantity || 1} = ₹${item.price * (item.quantity || 1)}`}
-                />
-              </ListItem>
-            ))}
-          </List>
+      <h3>Total: ₹{total.toFixed(2)}</h3>
 
-          <Divider sx={{ my: 2 }} />
+      <div>
+        <label>Delivery Address:</label>
+        <textarea
+          value={address}
+          onChange={e => setAddress(e.target.value)}
+          rows={3}
+          placeholder="Enter delivery address"
+        />
+      </div>
 
-          <Typography>Subtotal: ₹{subtotal.toFixed(2)}</Typography>
-          <Typography>GST (5%): ₹{gst.toFixed(2)}</Typography>
-          <Typography>Service Tax (10%): ₹{tax.toFixed(2)}</Typography>
-          <Typography variant="h6" sx={{ mt: 2 }}>Total: ₹{total.toFixed(2)}</Typography>
+      <div>
+        <label>Payment Method:</label>
+        <select
+          value={paymentMethod}
+          onChange={e => setPaymentMethod(e.target.value)}
+        >
+          <option value="COD">Cash on Delivery</option>
+          <option value="CARD">Credit/Debit Card</option>
+          <option value="UPI">UPI</option>
+        </select>
+      </div>
 
-          <Button variant="outlined" color="error" sx={{ mt: 2 }} onClick={clearCart}>
-            Clear Cart
-          </Button>
-        </>
-      )}
-    </Container>
+      <button onClick={handlePlaceOrder} disabled={loading}>
+        {loading ? 'Placing Order...' : 'Place Order'}
+      </button>
+    </div>
   );
 };
 
